@@ -1,5 +1,8 @@
 import numpy as np
 import csv
+import os
+
+os.makedirs('datasets', exist_ok=True)
 
 data_100 = np.random.randint(1, 300, size=(100,100))
 data_1000 = np.random.randint(1, 300, size=(1000,1000))
