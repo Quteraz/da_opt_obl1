@@ -11,11 +11,11 @@ with open('datasets/data_100', 'w') as csvfile:
 
 with open('datasets/data_1000', 'w') as csvfile:
 	writer = csv.writer(csvfile)
-	writer.writerows(data_100)
+	writer.writerows(data_1000)
 
 with open('datasets/data_10000', 'w') as csvfile:
 	writer = csv.writer(csvfile)
-	writer.writerows(data_100)
+	writer.writerows(data_10000)
 
 # with open('datasets/path_100', 'w') as csvfile:
 # 	writer = csv.writer(csvfile)

@@ -3,60 +3,65 @@ import csv
 
 with open('datasets/data_100', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data_100 = list(reader)
+	data = [list(reader)]
 with open('datasets/data_1000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data_1000 = list(reader)
+	data.append(list(reader))
 with open('datasets/data_10000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data_10000 = list(reader)
+	data.append(list(reader))
 
 def random_normal():
-	path_100 = np.random.permutation(100)
-	path_1000 = np.random.permutation(1000)
-	path_10000 = np.random.permutation(10000)
-
+	path = [np.random.permutation(100),np.random.permutation(1000),np.random.permutation(10000)]
 
 	length = [0,0,0]
-
-	last_pos = path_100[0]
-	for path in path_100:
-		if last_pos == path:
-			length[0] += 0
-		else: 
-			length[0] += int(data_100[last_pos][path])
-		last_pos = path
-
-	last_pos = path_1000[0]
-	for path in path_1000:
-		if last_pos == path:
-			length[1] += 0
-		else: 
-			length[1] += int(data_1000[last_pos][path])
-		last_pos = path
-		print(last_pos)
-
-	last_pos = path_10000[0]
-	for path in path_10000:
-		if last_pos == path:
-			length[2] += 0
-		else: 
-			length[2] += int(data_10000[last_pos][path])
-		last_pos = path
-	print ('length: ',length)
+	for i in range(3):
+		last_pos = path[i][0]
+		for current_pos in path[i]:
+			if last_pos == current_pos:
+				length[i] += 0
+			else:
+				length[i] += int(data[i][last_pos][current_pos])
+			last_pos = current_pos
 	return length
 
 def random_iterative(ant):
 	length = random_normal()
 	for _ in range(ant):
 		new_length = random_normal()
-		if new_length < length:
-			length = new_length
-	print('Final length:',length)
+		for index, element in enumerate(new_length):
+			if element < length[index]:
+				length[index] = element
+	return length
 
 def greedy():
-	print('greedy')
+	pos = [np.random.randint(100),np.random.randint(1000),np.random.randint(10000)]
 
-random_normal()
+	marked = [[0]*100,[0]*1000,[0]*10000]
+	length = [0,0,0]
+
+	for i in range(3):
+		marked[i][pos[i]] = 1
+		for _ in marked[i]:
+			val = -1
+			search = data[i][pos[i]]
+			for index, el in enumerate(search):
+				el = int(el)
+				if el < val and marked[i][index] != 1 or val < 0 and marked[i][index] != 1:
+					val = el
+					pos[i] = index
+				else:
+					pass
+			length[i] += val
+			marked[i][pos[i]] = 1
+	return length
+
+
+
+print('\n-------------------------------------------------------------------------------------')
+print ('Random\nLength: ',random_normal())
 print('-------------------------------------------------------------------------------------')
-random_iterative(50)
+print('Random Iterative\nLength:',random_iterative(50))
+print('-------------------------------------------------------------------------------------')
+print('Greedy\ntest:',greedy())
+print('-------------------------------------------------------------------------------------\n')
