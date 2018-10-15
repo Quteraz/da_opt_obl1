@@ -3,44 +3,48 @@ import csv
 
 with open('datasets/data_1000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data = [list(reader)]
+	data = {'short':list(reader)}
 with open('datasets/data_5000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data.append(list(reader))
+	data['medium'] = list(reader)
 with open('datasets/data_10000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data.append(list(reader))
+	data['large'] = list(reader)
+
+data_template = {
+		'short': {
+			'path':[],
+			'length':0
+		},
+		'medium': {
+			'path':[],
+			'length':0
+		},
+		'large': {
+			'path':[],
+			'length':0
+		}
+	}
 
 def random_normal():
 	# find random path
 	path = [np.random.permutation(1000),np.random.permutation(5000),np.random.permutation(10000)]
 	# Length in the format of [length of set 1000, length of set 5000, length of set 10000]
-	length = [0,0,0]
+	path_data = data_template
+	path_data['short']['path'] = np.random.permutation(1000)
+	path_data['medium']['path'] = np.random.permutation(5000)
+	path_data['large']['path'] = np.random.permutation(10000)
 
-	# iterete for each data set
-	for i in range(3):
-		last_pos = path[i][0]
-		for current_pos in path[i]:
+	# iterate for each data set
+	for i in path_data:
+		last_pos = path_data[i]['path'][0]
+		for current_pos in path_data[i]['path']:
 			if last_pos == current_pos:
-				length[i] += 0
+				path_data[i]['length'] += 0
 			else:
-				length[i] += int(data[i][last_pos][current_pos])
+				path_data[i]['length'] += int(data[i][last_pos][current_pos])
 			last_pos = current_pos
 
-	path_data = {
-		'short': {
-			'path':path[0],
-			'length':length[0]
-		},
-		'medium': {
-			'path':path[1],
-			'length':length[1]
-		},
-		'large': {
-			'path':path[2],
-			'length':length[2]
-		}
-	}
 	return path_data
 
 def random_iterative(ant):
@@ -50,10 +54,9 @@ def random_iterative(ant):
 	for _ in range(ant):
 		new_data = random_normal()
 		for element in new_data:
-			print(new_data[element]['length'],path_data[element]['length'])
 			if new_data[element]['length'] < path_data[element]['length']:
 				print('Hey')
-				path_data[element] = element
+				path_data[element] = new_data[element]
 	return path_data
 
 def greedy():
@@ -79,12 +82,21 @@ def greedy():
 		length[i] += int(data[i][start[i]][pos[i]])
 	return length
 
+random_data = random_normal()
+random_iterative_data = random_iterative(1000)
+# greedy_data = greedy()
 
 print('\nGenerating paths')
+print('-------------------------------------------------------------------------------------')
+print('Random')
+for e in random_data:
+	print('Length in',e,':',random_data[e]['length'])
+print('-------------------------------------------------------------------------------------')
+# print('Random Iterative')
+# for e in random_iterative_data:
+# 	print('Length: ',random_iterative_data[e]['length'])
 # print('-------------------------------------------------------------------------------------')
-# print ('Random\nLength: ',random_normal())
-print('-------------------------------------------------------------------------------------')
-print('Random Iterative\nLength:',random_iterative(1000))
-print('-------------------------------------------------------------------------------------')
-print('Greedy\nLength:',greedy())
-print('-------------------------------------------------------------------------------------\n')
+# print('Greedy')
+# for e in greedy_data:
+# 	print('Length: ',greedy_data[e]['length'])
+# print('-------------------------------------------------------------------------------------\n')
