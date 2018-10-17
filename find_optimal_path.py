@@ -28,9 +28,11 @@ data_template = {
 
 def random_normal():
 	# find random path
-	path = [np.random.permutation(1000),np.random.permutation(5000),np.random.permutation(10000)]
+	# path = [np.random.permutation(1000),np.random.permutation(5000),np.random.permutation(10000)]
 	# Length in the format of [length of set 1000, length of set 5000, length of set 10000]
 	path_data = data_template
+	for i in path_data:
+		path_data[i]['length'] = 0
 	path_data['short']['path'] = np.random.permutation(1000)
 	path_data['medium']['path'] = np.random.permutation(5000)
 	path_data['large']['path'] = np.random.permutation(10000)
@@ -48,14 +50,13 @@ def random_normal():
 	return path_data
 
 def random_iterative(ant):
-	# literally just freedy done ant number of times
+	# literally just random done ant number of times
 	path_data = random_normal()
 	# print(path_data)
 	for _ in range(ant):
 		new_data = random_normal()
 		for element in new_data:
 			if new_data[element]['length'] < path_data[element]['length']:
-				print('Hey')
 				path_data[element] = new_data[element]
 	return path_data
 
@@ -83,7 +84,7 @@ def greedy():
 	return length
 
 random_data = random_normal()
-random_iterative_data = random_iterative(1000)
+# random_iterative_data = random_iterative(1000)
 # greedy_data = greedy()
 
 print('\nGenerating paths')
@@ -92,10 +93,11 @@ print('Random')
 for e in random_data:
 	print('Length in',e,':',random_data[e]['length'])
 print('-------------------------------------------------------------------------------------')
-# print('Random Iterative')
-# for e in random_iterative_data:
-# 	print('Length: ',random_iterative_data[e]['length'])
-# print('-------------------------------------------------------------------------------------')
+random_data = random_iterative(1000)
+print('Random Iterative')
+for e in random_data:
+	print('Length: ',random_data[e]['length'])
+print('-------------------------------------------------------------------------------------')
 # print('Greedy')
 # for e in greedy_data:
 # 	print('Length: ',greedy_data[e]['length'])
