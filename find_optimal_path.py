@@ -61,27 +61,44 @@ def random_iterative(ant):
 	return path_data
 
 def greedy():
-	pos = [np.random.randint(1000),np.random.randint(5000),np.random.randint(10000)]
-	start = pos
-	marked = [[0]*1000,[0]*5000,[0]*10000]
-	length = [0,0,0]
+	# pos = [np.random.randint(1000),np.random.randint(5000),np.random.randint(10000)]
+	# start = pos
+	# marked = [[0]*1000,[0]*5000,[0]*10000]
+	# length = [0,0,0]
 
-	for i in range(3):
-		marked[i][pos[i]] = 1
-		for _ in marked[i]:
-			val = -1
-			search = data[i][pos[i]]
-			for index, el in enumerate(search):
-				el = int(el)
-				if el < val and marked[i][index] != 1 or val < 0 and marked[i][index] != 1:
-					val = el
-					pos[i] = index
+	mark_pos = {
+		'short': {
+			'pos':np.random.randint(1000),
+			'marked':[0]*1000
+		},
+		'medium': {
+			'pos':np.random.randint(5000),
+			'marked':[0]*5000
+		},
+		'large': {
+			'pos':np.random.randint(10000),
+			'marked':[0]*10000
+		}
+	}
+
+	path_data = data_template
+
+	for el in mark_pos:
+		mark_pos[el]['marked'][mark_pos[el]['pos']] = 1
+		for _ in mark_pos[el]['marked']:
+			length = 0
+			search = data[el][mark_pos[el]['pos']]
+			for index, val in enumerate(search):
+				if int(val) < path_data[el]['length'] and mark_pos[el]['marked'][index] != 1 or path_data[el]['length'] < 0 and mark_pos[el]['marked'][index] !=1:
+					length = int(val)
+					mark_pos[el]['pos'] = index
 				else:
 					pass
-			length[i] += val
-			marked[i][pos[i]] = 1
-		length[i] += int(data[i][start[i]][pos[i]])
-	return length
+			path_data[el]['length'] += length
+			# path_data[el]['path'].append(mark_pos[el]['pos'])
+			np.append(path_data[el]['path'], mark_pos[el]['pos'])
+			mark_pos[el]['marked'][mark_pos[el]['pos']] = 1
+	return path_data
 
 random_data = random_normal()
 # random_iterative_data = random_iterative(1000)
@@ -98,7 +115,8 @@ print('Random Iterative')
 for e in random_data:
 	print('Length: ',random_data[e]['length'])
 print('-------------------------------------------------------------------------------------')
-# print('Greedy')
-# for e in greedy_data:
-# 	print('Length: ',greedy_data[e]['length'])
-# print('-------------------------------------------------------------------------------------\n')
+greedy_data = greedy()
+print('Greedy')
+for e in greedy_data:
+	print('Length: ',greedy_data[e]['length'])
+print('-------------------------------------------------------------------------------------\n')
