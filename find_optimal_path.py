@@ -2,16 +2,6 @@ import numpy as np
 import csv
 import copy
 
-with open('datasets/data_1000', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data = {'short':list(reader)}
-with open('datasets/data_5000', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data['medium'] = list(reader)
-with open('datasets/data_10000', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data['large'] = list(reader)
-
 data_template = {
 		'short': {
 			'path':np.array([]),
@@ -27,7 +17,7 @@ data_template = {
 		}
 	}
 
-def random_normal():
+def random_normal(data):
 	# find random path
 	# path = [np.random.permutation(1000),np.random.permutation(5000),np.random.permutation(10000)]
 	# Length in the format of [length of set 1000, length of set 5000, length of set 10000]
@@ -50,19 +40,19 @@ def random_normal():
 
 	return path_data
 
-def random_iterative(ant):
+def random_iterative(data, ant):
 	# literally just random done ant number of times
-	path_data = random_normal()
+	path_data = random_normal(data)
 	# print(path_data)
 	for _ in range(ant):
-		new_data = random_normal()
+		new_data = random_normal(data)
 		for element in new_data:
 			if new_data[element]['length'] < path_data[element]['length']:
 				path_data[element]['length'] = new_data[element]['length']
 				path_data[element]['path'] = new_data[element]['path']
 	return path_data
 
-def greedy():
+def greedy(data):
 
 	path_data = copy.deepcopy(data_template)
 	for i in path_data:
@@ -102,7 +92,7 @@ def greedy():
 			mark_pos[el]['marked'][mark_pos[el]['pos']] = 1
 	return path_data
 
-def random_opt(path, ant):
+def greedy_opt(path,data, ant):
 	# pick two random nodes
 	# switch
 	# re-calculate new path
@@ -113,57 +103,19 @@ def random_opt(path, ant):
 			val2 = np.random.randint(0,len(el))
 			while val1 == val2:
 				val2 = np.random.randint(0,len(el))
+			if val1 == 0 or val2 == 0 or val1 == len(el) or val2 == len(el):
+				pass
 
-			sub1 = int(data[el][path[el]['path'][val1-1]][path[el]['path'][val1]]) + int(data[el][path[el]['path'][val1]][path[el]['path'][val1+1]])
-			sub2 = int(data[el][path[el]['path'][val2-1]][path[el]['path'][val2]]) + int(data[el][path[el]['path'][val2]][path[el]['path'][val2+1]])
-			add1 = int(data[el][path[el]['path'][val1-1]][path[el]['path'][val2]]) + int(data[el][path[el]['path'][val2]][path[el]['path'][val1+1]])
-			add2 = int(data[el][path[el]['path'][val2-1]][path[el]['path'][val1]]) + int(data[el][path[el]['path'][val1]][path[el]['path'][val2+1]])
+			sub1 = int(data[el][int(path[el]['path'][val1-1])][int(path[el]['path'][val1])]) + int(data[el][int(path[el]['path'][val1])][int(path[el]['path'][val1+1])])
+			sub2 = int(data[el][int(path[el]['path'][val2-1])][int(path[el]['path'][val2])]) + int(data[el][int(path[el]['path'][val2])][int(path[el]['path'][val2+1])])
+			add1 = int(data[el][int(path[el]['path'][val1-1])][int(path[el]['path'][val2])]) + int(data[el][int(path[el]['path'][val2])][int(path[el]['path'][val1+1])])
+			add2 = int(data[el][int(path[el]['path'][val2-1])][int(path[el]['path'][val1])]) + int(data[el][int(path[el]['path'][val1])][int(path[el]['path'][val2+1])])
 
 			length = path[el]['length'] - sub1 - sub2 + add1 + add2
 			if length < path[el]['length']:
-				path[el]['length'] = length 
-				placeholder = path[el]['path'][val1]
-				path[el]['path'][val1] = path[el]['path'][val2]
-				path[el]['path'][val2] = placeholder
+				path[el]['length'] = length
+				path[el]['path'][val1], path[el]['path'][val2] = path[el]['path'][val2], path[el]['path'][val1]
 	return path		
 
 # def random_greedy_opt():
 	# do stuff
-
-random_data = random_normal()
-random_iterative_data = random_iterative(1000)
-greedy_data = greedy()
-
-print('\nGenerating paths')
-print('-------------------------------------------------------------------------------------')
-print('Random')
-for e in random_data:
-	print('Length in',e,':',random_data[e]['length'])
-print('-------------------------------------------------------------------------------------')
-print('Random Iterative')
-for e in random_iterative_data:
-	print('Length in',e,':',random_iterative_data[e]['length'])
-print('-------------------------------------------------------------------------------------')
-print('Greedy')
-for e in greedy_data:
-	print('Length of',e,':',greedy_data[e]['length'])
-print('-------------------------------------------------------------------------------------')
-
-random_opt(random_data, 1000)
-random_opt(random_iterative_data, 1000)
-random_opt(greedy_data, 1000)
-
-print('\nOptimizing paths')
-print('-------------------------------------------------------------------------------------')
-print('Random')
-for e in random_data:
-	print('Length in',e,':',random_data[e]['length'])
-print('-------------------------------------------------------------------------------------')
-print('Random Iterative')
-for e in random_iterative_data:
-	print('Length in',e,':',random_iterative_data[e]['length'])
-print('-------------------------------------------------------------------------------------')
-print('Greedy')
-for e in greedy_data:
-	print('Length of',e,':',greedy_data[e]['length'])
-print('-------------------------------------------------------------------------------------\n')
