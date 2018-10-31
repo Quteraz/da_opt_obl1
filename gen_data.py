@@ -24,4 +24,7 @@ with open('datasets/data_5000', 'w') as csvfile:
 with open('datasets/data_10000', 'w') as csvfile:
 	writer = csv.writer(csvfile)
 	writer.writerows(data_10000)
+with open('datasets/data_100', 'w') as csvfile:
+	writer = csv.writer(csvfile)
+	writer.writerows(data_100)
 print('Done\n-------------------------------------------------------------------------------------\n')
