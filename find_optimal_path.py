@@ -58,6 +58,9 @@ def greedy_opt(path, length, data, iterations):
 	# re-calculate new path
 	# if better keep
 
+	best_path = cp.copy(path)
+	best_length = cp.copy(length)
+
 	axis_y = []
 
 	for _ in range(iterations):
@@ -68,16 +71,16 @@ def greedy_opt(path, length, data, iterations):
 			val2 = np.random.randint(0,len(path))
 		
 		# greedy part
-		new_path = cp.copy(path)
+		new_path = cp.copy(best_path)
 		new_path[val1], new_path[val2] = new_path[val2], new_path[val1]
 		new_length = calc_length(new_path, data)
-		if new_length < length:
-			length = new_length
-			path = new_path
+		if new_length < best_length:
+			best_length = new_length
+			best_path = new_path
 
 		# plotting
-		axis_y += [length]
-	return path, length, axis_y
+		axis_y += [best_length]
+	return best_path, best_length, axis_y
 
 def greedy_random_opt(path, length, data, prob, iterations):
 	# greedy opt with a hint of randomness
@@ -110,6 +113,6 @@ def greedy_random_opt(path, length, data, prob, iterations):
 					length = new_length
 					path = new_path
 			# plotting
-			axis_y += [length]
+		axis_y += [best_length]
 		prob *= 0.9
 	return best_path, best_length, axis_y
