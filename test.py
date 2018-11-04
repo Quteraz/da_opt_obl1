@@ -1,49 +1,56 @@
 import find_optimal_path as op
 import csv
 import sys
+import matplotlib.pyplot as plt
+
+plt.xlabel('Iterations')
+plt.ylabel('Length')
 
 print('\nReading files')
-with open('datasets/data_1000', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data_file = {'small':list(reader)}
-with open('datasets/data_5000', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data_file['medium'] = list(reader)
-with open('datasets/data_10000', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data_file['large'] = list(reader)
-with open('datasets/data_100', 'r') as csvfile:
-	reader = csv.reader(csvfile)
-	data_file['test'] = list(reader)
+
+# specify what data is being used
+data_set = str(sys.argv[1])
+
+if data_set == 'test':
+	with open('datasets/data_100', 'r') as csvfile:
+		reader = csv.reader(csvfile)
+		data= list(reader)
+elif data_set == 'small':
+	with open('datasets/data_1000', 'r') as csvfile:
+		reader = csv.reader(csvfile)
+		data = list(reader)
+elif data_set == 'medium':
+	with open('datasets/data_5000', 'r') as csvfile:
+		reader = csv.reader(csvfile)
+		data = list(reader)
+elif data_set == 'large':
+	with open('datasets/data_10000', 'r') as csvfile:
+		reader = csv.reader(csvfile)
+		data = list(reader)
+else:
+	print('error: no dataset with matching values. exiting')
+	quit()
+	
 print('Done\n-------------------------------------------------------------------------------------')
 
 print('\nGenerating paths')
 print('-------------------------------------------------------------------------------------')
 
-# specify what data is being used
-data_set = str(sys.argv[1])
-data = data_file[data_set]
-
-# Generating paths
-random_data = op.random_normal(data)
-random_iterative_data = op.random_iterative(data, 1000)
-greedy_data = op.greedy(data)
-
 print('Random')
 
-random_length = op.calc_length(random_data, data)
+random_data, random_length = op.random_normal(data)
 print('Length in',data_set,':',random_length)
 
 print('-------------------------------------------------------------------------------------')
 print('Random Iterative')
 
-iterative_length = op.calc_length(random_iterative_data, data)
+random_iterative_data, iterative_length = op.random_iterative(data, 1000)
 print('Length in',data_set,':',iterative_length)
 
 print('-------------------------------------------------------------------------------------')
 print('Greedy')
 
-greedy_length = op.calc_length(greedy_data, data)
+greedy_data, greedy_length = op.greedy(data)
 print('Length of',data_set,':',greedy_length)
 
 print('-------------------------------------------------------------------------------------')
@@ -51,55 +58,66 @@ print('-------------------------------------------------------------------------
 print('\nGreedy Optimizing')
 print('-------------------------------------------------------------------------------------')
 
-iterations = 10000
-
-opt_random_path = op.greedy_opt(random_data, data, iterations)
-opt_iterative_path = op.greedy_opt(random_iterative_data, data, iterations)
-opt_greedy_path = op.greedy_opt(greedy_data, data, iterations)
+iterations = 15000
 
 print('Random')
 
-random_length = op.calc_length(opt_random_path, data)
+opt_random_path, random_length, random_plt = op.greedy_opt(random_data, random_length, data, iterations)
 print('Length in',data_set,':',random_length)
 
 print('-------------------------------------------------------------------------------------')
 print('Random Iterative')
 
-iterative_length = op.calc_length(opt_iterative_path, data)
+opt_iterative_path, iterative_length, iterative_plt = op.greedy_opt(random_iterative_data, iterative_length, data, iterations)
 print('Length in',data_set,':',iterative_length)
 
 print('-------------------------------------------------------------------------------------')
 print('Greedy')
 
-greedy_length = op.calc_length(opt_greedy_path, data)
+opt_greedy_path, greedy_length, greedy_plt = op.greedy_opt(greedy_data, greedy_length, data, iterations)
 print('Length of',data_set,':',greedy_length)
 
 print('-------------------------------------------------------------------------------------')
+
+plt.subplot(211)
+plt.title('Greedy Optimizing')
+plt.xlabel('Iterations')
+plt.ylabel('Length')
+plt.plot(random_plt)
+plt.plot(iterative_plt, 'r')
+plt.plot(greedy_plt, 'g')
 
 print('\nGreedy Random Optimizing')
 print('-------------------------------------------------------------------------------------')
 
-iterations = 10000
+iterations = 1000
 prob = 0.9
 
-opt_random_path = op.greedy_random_opt(random_data, data,prob, iterations)
-opt_iterative_path = op.greedy_random_opt(random_iterative_data, data, prob, iterations)
-opt_greedy_path = op.greedy_random_opt(greedy_data, data, prob, iterations)
 
 print('Random')
 
-random_length = op.calc_length(opt_random_path, data)
+opt_random_path, random_length, random_plot = op.greedy_random_opt(random_data, random_length, data, prob, iterations)
 print('Length in',data_set,':',random_length)
 
 print('-------------------------------------------------------------------------------------')
 print('Random Iterative')
 
-iterative_length = op.calc_length(opt_iterative_path, data)
+opt_iterative_path, iterative_length, iterative_plot = op.greedy_random_opt(random_iterative_data, iterative_length, data, prob, iterations)
 print('Length in',data_set,':',iterative_length)
 print('-------------------------------------------------------------------------------------')
 print('Greedy')
 
-greedy_length = op.calc_length(opt_greedy_path, data)
+opt_greedy_path, greedy_length, greedy_plot = op.greedy_random_opt(greedy_data, greedy_length, data, prob, iterations)
 print('Length of',data_set,':',greedy_length)
 
 print('-------------------------------------------------------------------------------------\n')
+plt.subplot(212)
+plt.title('Greedy Random Optimizing')
+plt.xlabel('Iterations')
+plt.ylabel('Length')
+plt.plot(random_plot)
+plt.plot(iterative_plot, 'r')
+plt.plot(greedy_plot, 'g')
+plt.tight_layout()
+plt.savefig('datasets/plotting.png')
+plt.show()

@@ -18,19 +18,18 @@ def calc_length(path, data):
 def random_normal(data):
 	# Data in the format of data[i][i]
 	path = np.random.permutation(len(data[0]))
-	return path
+	length = calc_length(path, data)
+	return path, length
 
 def random_iterative(data, count):
 	# literally just random done count number of times
-	best_path = random_normal(data)
-	best_length = calc_length(best_path, data)
+	best_path, best_length = random_normal(data)
 	for _ in range(count):
-		new_path = random_normal(data)
-		new_length = calc_length(new_path, data)
+		new_path, new_length = random_normal(data)
 		if new_length < best_length:
 			best_path = new_path
 			best_length = new_length
-	return best_path
+	return best_path, best_length
 
 def greedy(data):
 
@@ -50,41 +49,51 @@ def greedy(data):
 				pass
 		path = np.append(path, pos)
 		marked[pos] = 1
-	return path
+	length = calc_length(path, data)
+	return path, length
 
-def greedy_opt(path,data, iterations):
+def greedy_opt(path, length, data, iterations):
 	# pick two random nodes
 	# switch
 	# re-calculate new path
 	# if better keep
-	length = calc_length(path, data)
+
+	axis_y = []
+
 	for _ in range(iterations):
+		# Setting up values
 		val1 = np.random.randint(0,len(path))
 		val2 = np.random.randint(0,len(path))
 		while val1 == val2:
 			val2 = np.random.randint(0,len(path))
 		
+		# greedy part
 		new_path = cp.copy(path)
 		new_path[val1], new_path[val2] = new_path[val2], new_path[val1]
 		new_length = calc_length(new_path, data)
 		if new_length < length:
 			length = new_length
 			path = new_path
-	return path		
 
-def greedy_random_opt(path, data, prob, iterations):
+		# plotting
+		axis_y += [length]
+	return path, length, axis_y
 
-	length = calc_length(path, data)
+def greedy_random_opt(path, length, data, prob, iterations):
+	# greedy opt with a hint of randomness
+	axis_y = []
+
 	best_path = cp.copy(path)
 	best_length = cp.copy(length)
 
 	while prob > 0.001:
 		for _ in range(iterations):
+			# setting up values
 			val1 = np.random.randint(0,len(path))
 			val2 = np.random.randint(0,len(path))
 			while val1 == val2:
 				val2 = np.random.randint(0,len(path))
-			
+			# greedy part
 			new_path = cp.copy(path)
 			new_path[val1], new_path[val2] = new_path[val2], new_path[val1]
 			new_length = calc_length(new_path, data)
@@ -95,10 +104,12 @@ def greedy_random_opt(path, data, prob, iterations):
 					best_length = new_length
 					best_path = new_path
 			else:
+				# random part based on prob
 				random = np.random.rand()
 				if random < prob:
 					length = new_length
 					path = new_path
+			# plotting
+			axis_y += [length]
 		prob *= 0.9
-	return best_path
-	
+	return best_path, best_length, axis_y
