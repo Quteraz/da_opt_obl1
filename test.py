@@ -5,7 +5,7 @@ import sys
 print('\nReading files')
 with open('datasets/data_1000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
-	data_file = {'short':list(reader)}
+	data_file = {'small':list(reader)}
 with open('datasets/data_5000', 'r') as csvfile:
 	reader = csv.reader(csvfile)
 	data_file['medium'] = list(reader)
@@ -26,7 +26,7 @@ data = data_file[data_set]
 
 # Generating paths
 random_data = op.random_normal(data)
-random_iterative_data = op.random_iterative(data, 100)
+random_iterative_data = op.random_iterative(data, 1000)
 greedy_data = op.greedy(data)
 
 print('Random')
@@ -79,7 +79,7 @@ print('-------------------------------------------------------------------------
 print('\nGreedy Random Optimizing')
 print('-------------------------------------------------------------------------------------')
 
-iterations = 1000
+iterations = 10000
 prob = 0.9
 
 opt_random_path = op.greedy_random_opt(random_data, data,prob, iterations)
